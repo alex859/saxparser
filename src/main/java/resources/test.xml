@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<person>
+    <name>Alessandro</name>
+    <surname>Ciccimarra</surname>
+    <address>
+        <firstLine>69 Burley House</firstLine>
+        <secondLine>WalterTerrace</secondLine>
+    </address>
+    <address>
+        <firstLine>47 Thomas Hollywood House</firstLine>
+        <secondLine>Something</secondLine>
+    </address>
+    <postcode>
+        <first>E1 0RG</first>
+    </postcode>
+</person>
