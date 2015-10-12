@@ -1,4 +1,4 @@
-package org.alex859.sax.handler;
+package org.alex859.sax;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
