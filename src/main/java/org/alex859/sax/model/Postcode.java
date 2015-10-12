@@ -1,8 +1,11 @@
 package org.alex859.sax.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * @author Alessandro Ciccimarra <alessandro.ciccimarra@gmail.com>
  */
+@XmlType(name = "postcode")
 public class Postcode
 {
     private String first;

@@ -1,13 +1,9 @@
 package org.alex859.sax;
 
-import org.alex859.sax.handler.BeanHandlerFactory;
-import org.alex859.sax.model.Address;
+import org.alex859.sax.handler.SAXParser;
 import org.alex859.sax.model.Person;
-import org.alex859.sax.model.Postcode;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileReader;
@@ -20,13 +16,10 @@ public class MyParser
 {
     public static void parse(final String filename) throws ParserConfigurationException, SAXException, IOException
     {
-		final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+		final SAXParser<Person> SAXParser = new SAXParser<>(Person.class, System
+            .out::println);
 
-		final BeanHandlerFactory beanHandlerFactory = new BeanHandlerFactory(xmlReader, Person.class, Address.class, Postcode.class);
-
-        xmlReader.setContentHandler(beanHandlerFactory.getRootHandler(Person.class, System.out::println));
-
-        xmlReader.parse(new InputSource(new FileReader(filename)));
+        SAXParser.parse(new InputSource(new FileReader(filename)));
     }
 
 
