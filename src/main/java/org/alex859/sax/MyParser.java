@@ -24,7 +24,7 @@ public class MyParser
 
 		final BeanHandlerFactory beanHandlerFactory = new BeanHandlerFactory(xmlReader, Person.class, Address.class, Postcode.class);
 
-        xmlReader.setContentHandler(beanHandlerFactory.getHandler(Person.class, System.out::println));
+        xmlReader.setContentHandler(beanHandlerFactory.getRootHandler(Person.class, System.out::println));
 
         xmlReader.parse(new InputSource(new FileReader(filename)));
     }

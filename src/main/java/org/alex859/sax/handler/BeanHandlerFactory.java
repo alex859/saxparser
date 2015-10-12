@@ -23,12 +23,12 @@ public class BeanHandlerFactory
 		this.allowedClasses.addAll(Arrays.asList(allowedClasses));
 	}
 
-	protected <T> BeanHandler<T> getHandler(final Class<T> clazz)
+	protected <T> BeanHandler<T> getRootHandler(final Class<T> clazz)
     {
-		return getHandler(clazz, o -> {});
+		return getRootHandler(clazz, o -> {});
     }
 
-	public <T> BeanHandler<T> getHandler(final Class<T> clazz, final Consumer<T> consumer)
+	public <T> BeanHandler<T> getRootHandler(final Class<T> clazz, final Consumer<T> consumer)
     {
 		if (isClassAllowed(clazz))
 		{

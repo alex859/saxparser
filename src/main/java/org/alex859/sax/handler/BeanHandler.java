@@ -58,7 +58,7 @@ class BeanHandler<T> extends DefaultHandler
 
 				if (beanHandlerFactory.isClassAllowed(beanHandlerClass))
                 {
-					final BeanHandler contentHandler = beanHandlerFactory.getHandler(beanHandlerClass);
+					final BeanHandler contentHandler = beanHandlerFactory.getRootHandler(beanHandlerClass);
                     final Class<?> type = contentHandler.getBeanType();
                     final Object object = type.newInstance();
 					if (Collection.class.isAssignableFrom(field.getType()))
