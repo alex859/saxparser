@@ -1,14 +1,19 @@
 package org.alex859.sax.model;
 
+import org.alex859.sax.annotation.XmlTagName;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Alessandro Ciccimarra <alessandro.ciccimarra@gmail.com>
  */
+@XmlTagName("person")
 public class Person
 {
+    @XmlTagName("name")
     private String name;
+    @XmlTagName("surname")
     private String surname;
     private Postcode postcode;
 

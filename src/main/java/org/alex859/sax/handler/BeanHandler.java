@@ -1,5 +1,6 @@
 package org.alex859.sax.handler;
 
+import org.alex859.sax.annotation.XmlTagName;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -10,8 +11,12 @@ import java.io.CharArrayWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Alessandro Ciccimarra <alessandro.ciccimarra@gmail.com>
@@ -23,6 +28,9 @@ class BeanHandler<T> extends DefaultHandler
 	private final Class<T> beanType;
 	private final Consumer<T> consumer;
 
+	private String beanTypeXmlTagName;
+	private Map<String, Field> beanTypeFieldsXmlTagNames;
+
 	private T currentObject;
 	private ContentHandler parentHandler;
 	private XMLReader xmlReader;
@@ -32,9 +40,24 @@ class BeanHandler<T> extends DefaultHandler
         this.beanType = beanType;
         this.beanHandlerFactory = beanHandlerFactory;
 		this.consumer = consumer;
+
+		initBeanTypeXml();
     }
 
-    protected void collect(final T currentObject, final ContentHandler parentHandler)
+	private void initBeanTypeXml()
+	{
+		final XmlTagName beanTypeAnnotation = beanType.getAnnotation(XmlTagName.class);
+		this.beanTypeXmlTagName = beanTypeAnnotation != null ? beanTypeAnnotation.value() : beanType.getSimpleName();
+
+		this.beanTypeFieldsXmlTagNames = Arrays.stream(beanType.getDeclaredFields())
+				.peek(f -> f.setAccessible(true))
+				.collect(Collectors.toMap(f -> {
+			final XmlTagName beanTypeFieldAnnotation = f.getAnnotation(XmlTagName.class);
+			return beanTypeFieldAnnotation != null ? beanTypeFieldAnnotation.value() : f.getName();
+		}, Function.<Field>identity()));
+	}
+
+	protected void collect(final T currentObject, final ContentHandler parentHandler)
     {
         this.parentHandler = parentHandler;
         this.currentObject = currentObject;
@@ -47,13 +70,13 @@ class BeanHandler<T> extends DefaultHandler
         contents.reset();
         try
         {
-            if (beanType.getSimpleName().equalsIgnoreCase(qName))
+            if (beanTypeXmlTagName.equals(qName))
             {
                 currentObject = beanType.newInstance();
             }
             else
             {
-				final Field field = getAccessibleField(qName);
+				final Field field = beanTypeFieldsXmlTagNames.get(qName);
 				final Class<?> beanHandlerClass = getBeanHandlerClass(field);
 
 				if (beanHandlerFactory.isClassAllowed(beanHandlerClass))
@@ -93,10 +116,10 @@ class BeanHandler<T> extends DefaultHandler
         {
             try
             {
-				final Field field = getAccessibleField(qName);
+				final Field field = beanTypeFieldsXmlTagNames.get(qName);
 				field.set(currentObject, contents.toString());
             }
-            catch (NoSuchFieldException | IllegalAccessException e)
+            catch (IllegalAccessException e)
             {
                 e.printStackTrace();
             }
@@ -133,7 +156,7 @@ class BeanHandler<T> extends DefaultHandler
         return propertyType;
     }
 
-    public Class<?> getBeanType()
+    protected Class<?> getBeanType()
     {
         return beanType;
     }

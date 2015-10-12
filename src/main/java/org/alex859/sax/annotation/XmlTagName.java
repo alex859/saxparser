@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
  * @author Alessandro Ciccimarra <alessandro.ciccimarra@gmail.com>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface ListElementName
+@Target({ElementType.FIELD, ElementType.TYPE})
+public @interface XmlTagName
 {
-    String name();
+    String value();
 }
