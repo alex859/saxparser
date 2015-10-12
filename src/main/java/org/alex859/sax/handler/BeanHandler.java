@@ -68,71 +68,93 @@ class BeanHandler<T> extends DefaultHandler
     public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException
     {
         contents.reset();
-        try
-        {
-            if (beanTypeXmlTagName.equals(qName))
-            {
-                currentObject = beanType.newInstance();
-            }
-            else
-            {
-				final Field field = beanTypeFieldsXmlTagNames.get(qName);
-				final Class<?> beanHandlerClass = getBeanHandlerClass(field);
 
-				if (beanHandlerFactory.isClassAllowed(beanHandlerClass))
-                {
-					final BeanHandler contentHandler = beanHandlerFactory.getRootHandler(beanHandlerClass);
-                    final Class<?> type = contentHandler.getBeanType();
-                    final Object object = type.newInstance();
-					if (Collection.class.isAssignableFrom(field.getType()))
-                    {
-                        ((Collection) field.get(currentObject)).add(object);
-                    }
-                    else
-                    {
-                        field.set(currentObject, object);
-                    }
+		if (isTagKnown(qName))
+		{
+			try
+			{
+				if (beanTypeXmlTagName.equals(qName))
+				{
+					currentObject = beanType.newInstance();
+				}
+				else
+				{
+					final Field field = beanTypeFieldsXmlTagNames.get(qName);
+					if (field == null)
+					{
+						System.out.println("Field not found: " + qName);
+						return;
+					}
 
-                    contentHandler.collect(object, this);
-                }
-            }
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException |
-                NoSuchFieldException e)
-        {
-            e.printStackTrace();
-        }
+					final Class<?> beanHandlerClass = getBeanHandlerClass(field);
+
+					if (beanHandlerFactory.isClassAllowed(beanHandlerClass))
+					{
+						final BeanHandler contentHandler = beanHandlerFactory.getRootHandler(beanHandlerClass);
+						final Class<?> type = contentHandler.getBeanType();
+						final Object object = type.newInstance();
+						if (Collection.class.isAssignableFrom(field.getType()))
+						{
+							((Collection) field.get(currentObject)).add(object);
+						}
+						else
+						{
+							field.set(currentObject, object);
+						}
+
+						contentHandler.collect(object, this);
+					}
+				}
+			}
+			catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException |
+					NoSuchFieldException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			System.out.println("Skipping opening tag: " + qName);
+		}
+
     }
 
-    @Override
+	private boolean isTagKnown(final String qName)
+	{
+		return !(!qName.equals(beanTypeXmlTagName) && !beanTypeFieldsXmlTagNames.containsKey(qName));
+	}
+
+	@Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException
     {
-        if (beanType.getSimpleName().equalsIgnoreCase(qName))
-        {
-            xmlReader.setContentHandler(parentHandler);
-			consumer.accept(currentObject);
-        }
-        else
-        {
-            try
-            {
-				final Field field = beanTypeFieldsXmlTagNames.get(qName);
-				field.set(currentObject, contents.toString());
-            }
-            catch (IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
+		if (isTagKnown(qName))
+		{
+			if (beanType.getSimpleName().equalsIgnoreCase(qName))
+			{
+				if (parentHandler != null)
+				{
+					xmlReader.setContentHandler(parentHandler);
+				}
+				consumer.accept(currentObject);
+			}
+			else
+			{
+				try
+				{
+					final Field field = beanTypeFieldsXmlTagNames.get(qName);
+					field.set(currentObject, contents.toString());
+				}
+				catch (IllegalAccessException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else
+		{
+			System.out.println("Skipping closing tag: " + qName);
 		}
     }
-
-	private Field getAccessibleField(final String fieldName) throws NoSuchFieldException
-	{
-		final Field field = beanType.getDeclaredField(fieldName);
-		field.setAccessible(true);
-
-		return field;
-	}
 
 	@Override
     public void characters(final char[] ch, final int start, final int length) throws SAXException
