@@ -1,8 +1,5 @@
 package org.alex859.sax.handler;
 
-import org.apache.commons.beanutils.ConstructorUtils;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.logging.log4j.core.config.plugins.util.ResolverUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -14,32 +11,32 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author Alessandro Ciccimarra <alessandro.ciccimarra@gmail.com>
  */
-public class BeanHandler extends DefaultHandler
+class BeanHandler<T> extends DefaultHandler
 {
     private final CharArrayWriter contents = new CharArrayWriter();
-    private Object currentObject;
-    private ContentHandler parentHandler;
-    private XMLReader xmlReader;
-    private final Map<Class<?>, BeanHandler> contentHandlerMap;
-    private final Class<?> type;
+    private final BeanHandlerFactory beanHandlerFactory;
+	private final Class<T> beanType;
+	private final Consumer<T> consumer;
 
-    public BeanHandler(final Class<?> type, final Map<Class<?>, BeanHandler> contentHandlerMap)
+	private T currentObject;
+	private ContentHandler parentHandler;
+	private XMLReader xmlReader;
+
+	BeanHandler(final Class<T> beanType, final BeanHandlerFactory beanHandlerFactory, final Consumer<T> consumer)
     {
-        this.type = type;
-        this.contentHandlerMap = contentHandlerMap;
+        this.beanType = beanType;
+        this.beanHandlerFactory = beanHandlerFactory;
+		this.consumer = consumer;
     }
 
-    public void collect(final Object currentObject, final ContentHandler parentHandler, final XMLReader xmlReader)
+    protected void collect(final T currentObject, final ContentHandler parentHandler)
     {
         this.parentHandler = parentHandler;
-        this.xmlReader = xmlReader;
-        this.xmlReader.setContentHandler(this);
         this.currentObject = currentObject;
     }
 
@@ -50,27 +47,30 @@ public class BeanHandler extends DefaultHandler
         contents.reset();
         try
         {
-            if (type.getSimpleName().equalsIgnoreCase(qName))
+            if (beanType.getSimpleName().equalsIgnoreCase(qName))
             {
-                currentObject = ConstructorUtils.invokeConstructor(type, null);
+                currentObject = beanType.newInstance();
             }
             else
             {
-                final BeanHandler contentHandler = contentHandlerMap.get(getBeanHandlerKey(currentObject, qName));
-                if (contentHandler != null)
+				final Field field = getAccessibleField(qName);
+				final Class<?> beanHandlerClass = getBeanHandlerClass(field);
+
+				if (beanHandlerFactory.isClassAllowed(beanHandlerClass))
                 {
-                    final Class<?> type = contentHandler.getType();
-                    final Object object = ConstructorUtils.invokeConstructor(type, null);
-                    if (Collection.class.isAssignableFrom(PropertyUtils.getPropertyType(currentObject, qName)))
+					final BeanHandler contentHandler = beanHandlerFactory.getHandler(beanHandlerClass);
+                    final Class<?> type = contentHandler.getBeanType();
+                    final Object object = type.newInstance();
+					if (Collection.class.isAssignableFrom(field.getType()))
                     {
-                        ((Collection) PropertyUtils.getProperty(currentObject, qName)).add(object);
+                        ((Collection) field.get(currentObject)).add(object);
                     }
                     else
                     {
-                        PropertyUtils.setProperty(currentObject, qName, object);
+                        field.set(currentObject, object);
                     }
 
-                    contentHandler.collect(object, this, xmlReader);
+                    contentHandler.collect(object, this);
                 }
             }
         }
@@ -84,55 +84,62 @@ public class BeanHandler extends DefaultHandler
     @Override
     public void endElement(final String uri, final String localName, final String qName) throws SAXException
     {
-        if (type.getSimpleName().equalsIgnoreCase(qName))
+        if (beanType.getSimpleName().equalsIgnoreCase(qName))
         {
             xmlReader.setContentHandler(parentHandler);
+			consumer.accept(currentObject);
         }
         else
         {
             try
             {
-                PropertyUtils.setProperty(currentObject, qName, contents.toString());
+				final Field field = getAccessibleField(qName);
+				field.set(currentObject, contents.toString());
             }
-            catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+            catch (NoSuchFieldException | IllegalAccessException e)
             {
                 e.printStackTrace();
             }
-        }
+		}
     }
 
-    @Override
+	private Field getAccessibleField(final String fieldName) throws NoSuchFieldException
+	{
+		final Field field = beanType.getDeclaredField(fieldName);
+		field.setAccessible(true);
+
+		return field;
+	}
+
+	@Override
     public void characters(final char[] ch, final int start, final int length) throws SAXException
     {
         contents.write(ch, start, length);
     }
 
-    protected Class<?> getBeanHandlerKey(final Object currentObject, final String qName) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException
+	/**
+	 *	Given a field, it returns its type, or, if it is a collection, it returns the type argument
+	 */
+    protected Class<?> getBeanHandlerClass(final Field field) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException
     {
-        final Class<?> propertyType = PropertyUtils.getPropertyType(currentObject, qName);
-
+		final Class<?> propertyType = field.getType();
         if (Collection.class.isAssignableFrom(propertyType))
         {
-            final Field listField = currentObject.getClass().getDeclaredField(qName);
-            final ParameterizedType listType = (ParameterizedType) listField.getGenericType();
-            return (Class<?>) listType.getActualTypeArguments()[0];
+			final ParameterizedType listType = (ParameterizedType) field.getGenericType();
+
+			return (Class<?>) listType.getActualTypeArguments()[0];
         }
 
         return propertyType;
     }
 
-    public Class<?> getType()
+    public Class<?> getBeanType()
     {
-        return type;
+        return beanType;
     }
 
     public void setXmlReader(final XMLReader xmlReader)
     {
         this.xmlReader = xmlReader;
-    }
-
-    public Object getCurrentObject()
-    {
-        return currentObject;
     }
 }

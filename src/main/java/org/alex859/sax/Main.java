@@ -10,6 +10,6 @@ public class Main
 
     public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException
     {
-        MyParser.parse("/home/alex859/DevEnv/workspace/sax/resources/test.xml");
+        MyParser.parse("/home/alessandro.ciccimarra/DevEnv/saxparser/src/main/java/resources/test.xml");
     }
 }
