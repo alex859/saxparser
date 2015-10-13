@@ -3,6 +3,8 @@ package org.alex859.sax;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -44,6 +46,11 @@ public class SAXParser<ROOT_TYPE>
 	public void parse(final InputSource inputSource) throws IOException, SAXException
 	{
 		this.xmlReader.parse(inputSource);
+	}
+
+	public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException
+	{
+		this.xmlReader.setFeature(name, value);
 	}
 
 	private BeanHandler<?> getHandler(final Field field)
