@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * Generic class to parse and process an XML document based on {@link XMLReader}.
+ * Generic class to parse and process an XML document based on SAX {@link XMLReader}.
  * You need to define the topmost XML type you are interested in processing. The desired {@link Consumer} will be used to
  * process the objects as they are parsed from the files.
  * Standard Java {@link XmlType} and {@link XmlElement} can be used to annotate POJOs and define mapping between classes, attributes and XML tags.

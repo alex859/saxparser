@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<person>
+<root>
+    <person>
     <name>Alessandro</name>
     <surname>Ciccimarra</surname>
     <address>
@@ -14,3 +15,19 @@
         <first>E1 0RG</first>
     </postcode>
 </person>
+<person>
+    <name>Diego</name>
+    <surname>Scalera</surname>
+    <address>
+        <firstLine>670 Burley House</firstLine>
+        <secondLine>Ciccio bello</secondLine>
+    </address>
+    <address>
+        <firstLine>Basinghall street</firstLine>
+        <secondLine>Secondline</secondLine>
+    </address>
+    <postcode>
+        <first>E7 543</first>
+    </postcode>
+</person>
+</root>
