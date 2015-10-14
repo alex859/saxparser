@@ -1,6 +1,7 @@
 package org.alex859.sax;
 
 import org.alex859.sax.model.Item;
+import org.alex859.sax.model.Person;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
@@ -22,11 +23,11 @@ public class Main
 //
 //        final Person p = (Person) objectInputStream.readObject();
 
-        StAXParser<Item> staxParser = new StAXParser<>(Item.class, new FileInputStream(new File("/home/alex859/DevEnv/workspace/sax/src/main/resources/test.xml")));
+        StAXParser<Person> staxParser = new StAXParser<>(Person.class, new FileInputStream(new File("/home/alessandro.ciccimarra/DevEnv/saxparser/src/main/resources/test.xml")));
 
 		while(staxParser.hasNext())
 		{
-			staxParser.next();
+			System.out.println(staxParser.next());
 		}
     }
 }

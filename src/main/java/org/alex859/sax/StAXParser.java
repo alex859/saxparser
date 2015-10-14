@@ -36,6 +36,7 @@ import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
  * This class is not thread safe.
  * <p>
  * // TODO Handle errors
+ * // TODO Converters for basic types
  * // TODO Logging
  *
  * @param <TYPE> The topmost XML type we are interested in
@@ -162,6 +163,7 @@ public class StAXParser<TYPE> implements Iterator<TYPE>
 		catch (final XMLStreamException e)
 		{
 			//	TODO
+			e.printStackTrace();
 			return null;
 		}
 
