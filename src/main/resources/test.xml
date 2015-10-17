@@ -1,33 +1,33 @@
 <?xml version="1.0"?>
 <root>
     <person>
-    <name>Alessandro</name>
-    <surname>Ciccimarra</surname>
-    <address>
-        <firstLine>69 Burley House</firstLine>
-        <secondLine>WalterTerrace</secondLine>
-    </address>
-    <address>
-        <firstLine>47 Thomas Hollywood House</firstLine>
-        <secondLine>Something</secondLine>
-    </address>
-    <postcode>
-        <first>E1 0RG</first>
-    </postcode>
-</person>
-<person>
-    <name>Diego</name>
-    <surname>Scalera
-    <address>
-        <firstLine>670 Burley House</firstLine>
-        <secondLine>Ciccio bello</secondLine>
-    </address>
-    <address>
-        <firstLine>Basinghall street</firstLine>
-        <secondLine>Secondline</secondLine>
-    </address>
-    <postcode>
-        <first>E7 543</first>
-    </postcode>
-</person>
+        <name>Diego</name>
+        <surname>Scalera
+        <address>
+            <firstLine>670 Burley House</firstLine>
+            <secondLine>Ciccio bello</secondLine>
+        </address>
+        <address>
+            <firstLine>Basinghall street</firstLine>
+            <secondLine>Secondline</secondLine>
+        </address>
+        <postcode>
+            <first>E7 543</first>
+        </postcode>
+    </person>
+    <person>
+        <name>Alessandro</name>
+        <surname>Ciccimarra</surname>
+        <address>
+            <firstLine>69 Burley House</firstLine>
+            <secondLine>WalterTerrace</secondLine>
+        </address>
+        <address>
+            <firstLine>47 Thomas Hollywood House</firstLine>
+            <secondLine>Something</secondLine>
+        </address>
+        <postcode>
+            <first>E1 0RG</first>
+        </postcode>
+    </person>
 </root>

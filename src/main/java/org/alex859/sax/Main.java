@@ -23,7 +23,7 @@ public class Main
 //
 //        final Person p = (Person) objectInputStream.readObject();
 
-        StAXParser<Person> staxParser = new StAXParser<>(Person.class, new FileInputStream(new File("/home/alessandro.ciccimarra/DevEnv/saxparser/src/main/resources/test.xml")));
+        StAXParser<Person> staxParser = new StAXParser<>(Person.class, new FileInputStream(new File("/home/alex859/DevEnv/workspace/sax/src/main/resources/test.xml")));
 
 		while(staxParser.hasNext())
 		{

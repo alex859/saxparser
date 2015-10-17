@@ -164,7 +164,9 @@ public class StAXParser<TYPE> implements Iterator<TYPE>
 		{
 			//	TODO
 			e.printStackTrace();
-			return null;
+			currentEventHandler = eventHandler;
+            // reset current objects on handlers
+            beanHandlersMap.values().forEach(EventHandler::reset);
 		}
 
 		return null;
@@ -368,6 +370,7 @@ public class StAXParser<TYPE> implements Iterator<TYPE>
 					{
 						// control goes back to the parent handler
 						currentEventHandler = parentHandler;
+                        reset();
 					}
 				}
 				else
@@ -401,6 +404,12 @@ public class StAXParser<TYPE> implements Iterator<TYPE>
 				e.printStackTrace();
 			}
 		}
+
+        private void reset()
+        {
+            currentObject = null;
+            parentHandler = null;
+        }
 
 		public String getBeanTypeXmlTagName()
 		{
